@@ -377,7 +377,7 @@ function unsubAll(){unsubs.forEach(fn=>fn());unsubs=[];}
 function getInviteUrl(){return `${location.origin}${location.pathname}?room=${roomCode}`;}
 
 // ── THEME ──
-function startTheme(){const a=document.getElementById('themeAudio');if(a.paused)a.play().catch(()=>{});}
+function startTheme(){const a=document.getElementById('themeAudio');a.volume=0.5;if(a.paused)a.play().catch(()=>{});}
 
 // ── SOUND FX via Web Audio ──
 function initAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();}

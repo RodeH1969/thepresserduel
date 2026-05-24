@@ -127,7 +127,7 @@ def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     print(f"\nThe Presser — Audio Maker")
     print(f"Output: {OUTPUT_DIR}")
-    print(f"{\'─\' * 60}")
+    print('-' * 60)
 
     done = 0
     failed = []
@@ -167,7 +167,7 @@ def main():
             failed.append((num, str(e)))
         time.sleep(0.4)
 
-    print(f"{\'─\' * 60}")
+    print('-' * 60)
     print(f"Complete: {done} files saved to assets/audio/")
     if failed:
         print(f"Failed ({len(failed)}) — re-run to retry:")

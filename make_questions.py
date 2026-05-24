@@ -112,33 +112,52 @@ def generate_audio(text, filepath):
     with open(filepath, "wb") as f:
         f.write(response.content)
 
+RULES_TEXT = (
+    "Welcome to The Presser. "
+    "You are about to face fifty maths questions. "
+    "Each question will be read aloud. "
+    "You have twenty seconds to work out the answer and type it in. "
+    "If you get it right and your opponent gets it wrong — you win the round. "
+    "If both players answer correctly, or both get it wrong — it is a draw and we move to the next question. "
+    "There is no speed advantage. Accuracy is everything. "
+    "Take the chair."
+)
+
 def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-    print(f"\nThe Presser — Question Audio Maker")
+    print(f"\nThe Presser — Audio Maker")
     print(f"Output: {OUTPUT_DIR}")
-    print(f"Voice:  Adam  |  50 questions  |  10 blocks of 5")
-    print(f"Pattern per block: bracket equation · subtraction · multiplication · square · addition")
-    print(f"{'─' * 60}")
+    print(f"{\'─\' * 60}")
 
     done = 0
     failed = []
 
+    # Generate rules.mp3 first
+    rules_path = os.path.join(OUTPUT_DIR, "rules.mp3")
+    if not os.path.exists(rules_path):
+        print(f"  [00/50] (rules   )  rules.mp3...", end="", flush=True)
+        try:
+            generate_audio(RULES_TEXT, rules_path)
+            print(f" ✓")
+            done += 1
+        except Exception as e:
+            print(f" ✗  {e}")
+            failed.append(("rules", str(e)))
+        import time as _t; _t.sleep(0.4)
+    else:
+        print(f"  [00/50] rules.mp3 exists — skipping")
+        done += 1
+
+    # Generate question MP3s
     for num, spoken, answer in QUESTIONS:
         filename = f"q{str(num).zfill(3)}.mp3"
         filepath = os.path.join(OUTPUT_DIR, filename)
-
-        # Delete old file if exists to force regeneration at new speed
         if os.path.exists(filepath):
-            os.remove(filepath)
-        if False and os.path.exists(filepath):
             print(f"  [{num:02d}/50] {filename} exists — skipping")
             done += 1
             continue
-
         qtype = {1:"bracket",2:"subtract",3:"multiply",4:"square",5:"addition"}[(num-1)%5+1]
         print(f"  [{num:02d}/50] ({qtype:8s})  {filename}...", end="", flush=True)
-
         try:
             generate_audio(spoken, filepath)
             print(f" ✓  = {answer}")
@@ -146,15 +165,14 @@ def main():
         except Exception as e:
             print(f" ✗  {e}")
             failed.append((num, str(e)))
-
         time.sleep(0.4)
 
-    print(f"{'─' * 60}")
-    print(f"Complete: {done}/50 saved to assets/audio/")
+    print(f"{\'─\' * 60}")
+    print(f"Complete: {done} files saved to assets/audio/")
     if failed:
         print(f"Failed ({len(failed)}) — re-run to retry:")
         for num, err in failed:
-            print(f"  Q{num:02d}: {err}")
+            print(f"  Q{num}: {err}")
 
 if __name__ == "__main__":
     main()
